@@ -1,7 +1,14 @@
+INCLUDE_PATHS = -I./ERROR/ -I./TOOLS/ -I./GPIO/ -I./UART/ -I./RCC/
+
 all:
-	arm-none-eabi-gcc -o main.o -c main.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o main.o -c main.c -mcpu=cortex-m4 -g -mthumb 
 	arm-none-eabi-gcc -o vector_table.o -c vector_table.c -mcpu=cortex-m4 -g -mthumb 
-	arm-none-eabi-ld -Tlinker.ld main.o vector_table.o -o ./build/stm32F407xx.elf
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o error.o -c ./ERROR/error.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o tool.o -c ./TOOLS/tool.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o gpio.o -c ./GPIO/gpio.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o uart.o -c ./UART/uart.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o rcc.o -c ./RCC/rcc.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-ld -Tlinker.ld main.o vector_table.o error.o tool.o gpio.o uart.o rcc.o -o ./build/stm32F407xx.elf
 	arm-none-eabi-objdump -D -S ./build/stm32F407xx.elf > ./build/stm32F407xx.elf.lst
 
 clean:
