@@ -1,0 +1,31 @@
+{
+  // Combined launch configurations: Cortex-Debug (ST-Link) and ST extension
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cortex-Debug: ST-Link (Launch)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "stlink",
+      "cwd": "${workspaceFolder}",
+      // Path to your ELF file (update to your build output)
+      "executable": "${workspaceFolder}/build/stm32F407xx.elf",
+      // Set your STM32 device/part here (e.g. "STM32F407VG")
+      "device": "STM32F4xx",
+      // Optional: provide an SVD file for peripheral register view
+      "svdFile": "${workspaceFolder}/STM32F4.svd",
+      // Optional: preLaunchTask name to build the project before debugging
+      "preLaunchTask": "build",
+      "configFiles": [],
+      "searchDir": []
+    },
+    {
+      "name": "ST: Debug (Launch)",
+      "type": "st",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/stm32F407xx.elf",
+      "device": "STM32F4xx",
+      "preLaunchTask": "build"
+    }
+  ]
+}
