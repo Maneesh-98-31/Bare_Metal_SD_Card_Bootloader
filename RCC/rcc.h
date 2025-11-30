@@ -2,6 +2,7 @@
 #define _RCC_H_
 
 #include "stdint.h"
+#include "tool.h"
 
 typedef struct{
     volatile uint32_t RCC_CR;                                   // 0x0
@@ -93,13 +94,13 @@ typedef enum{
     APB2
 }BUS_SELECTION;
 
-#define RCC_BASE_ADDRESS        0x40023800;
+#define RCC_BASE_ADDRESS        0x40023800
 
 
 #define ENABLE_PLL(rcc)         (rcc->RCC_CR |= (1 << 24));
 
 
-static rcc_def *RCC = (rcc_def*)RCC_BASE_ADDRESS;
+static rcc_def *RCC;
 
 uint32_t enable_rcc(CLOCK_SELECTION);
 uint32_t disable_rcc(CLOCK_SELECTION);
@@ -110,43 +111,53 @@ BUS_SELECTION find_interface(INTERFACE_SELECTION);
 uint32_t get_sysclock(void);
 
 
-#define GPIOA_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 0))
-#define GPIOB_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 1))
-#define GPIOC_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 2))
-#define GPIOD_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 3))
-#define GPIOE_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 4))
-#define GPIOF_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 5))
-#define GPIOG_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 6))
-#define GPIOH_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 7))
-#define GPIOI_CLOCK_ENABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR |= (1 << 8))
+#define GPIOA_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 0))
+#define GPIOB_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 1))
+#define GPIOC_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 2))
+#define GPIOD_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 3))
+#define GPIOE_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 4))
+#define GPIOF_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 5))
+#define GPIOG_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 6))
+#define GPIOH_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 7))
+#define GPIOI_CLOCK_ENABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR |= (1 << 8))
 
-#define GPIOA_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 0))
-#define GPIOB_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 1))
-#define GPIOC_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 2))
-#define GPIOD_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 3))
-#define GPIOE_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 4))
-#define GPIOF_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 5))
-#define GPIOG_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 6))
-#define GPIOH_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 7))
-#define GPIOI_CLOCK_DISABLE() 			(((rcc_def*)RCC)->RCC_AHB1ENR &= ~(1 << 8))
+#define GPIOA_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 0))
+#define GPIOB_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 1))
+#define GPIOC_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 2))
+#define GPIOD_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 3))
+#define GPIOE_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 4))
+#define GPIOF_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 5))
+#define GPIOG_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 6))
+#define GPIOH_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 7))
+#define GPIOI_CLOCK_DISABLE() 			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1ENR &= ~(1 << 8))
 
-#define GPIOA_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<0)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<0)); }while(0)
-#define GPIOB_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<1)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<1)); }while(0)
-#define GPIOC_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<2)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<2)); }while(0)
-#define GPIOD_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<3)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<3)); }while(0)
-#define GPIOE_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<4)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<4)); }while(0)
-#define GPIOF_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<5)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<5)); }while(0)
-#define GPIOG_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<6)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<6)); }while(0)
-#define GPIOH_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<7)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<7)); }while(0)
-#define GPIOI_CLOCK_RESET()				do{ (((rcc_def*)RCC)->RCC_AHB1RSTR |= (1<<8)); (((rcc_def*)RCC)->RCC_AHB1RSTR &= ~(1<<8)); }while(0)
+#define GPIOA_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<0)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<0)); }while(0)
+#define GPIOB_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<1)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<1)); }while(0)
+#define GPIOC_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<2)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<2)); }while(0)
+#define GPIOD_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<3)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<3)); }while(0)
+#define GPIOE_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<4)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<4)); }while(0)
+#define GPIOF_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<5)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<5)); }while(0)
+#define GPIOG_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<6)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<6)); }while(0)
+#define GPIOH_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<7)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<7)); }while(0)
+#define GPIOI_CLOCK_RESET()				do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR |= (1<<8)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_AHB1RSTR &= ~(1<<8)); }while(0)
 
-#define USART1_CLOCK_ENABLE()			(((rcc_def*)RCC)->RCC_APB2ENR |= (1<<4))
-#define USART1_CLOCK_DISABLE()			(((rcc_def*)RCC)->RCC_APB2ENR &= ~(1<<4))
+#define USART1_CLOCK_ENABLE()			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR |= (1<<4))
+#define USART1_CLOCK_DISABLE()			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR &= ~(1<<4))
 
 
-#define USART2_CLOCK_ENABLE()			(((rcc_def*)RCC)->RCC_APB2ENR |= (1<<17))
-#define USART2_CLOCK_DISABLE()			(((rcc_def*)RCC)->RCC_APB2ENR &= ~(1<<17))
+#define USART2_CLOCK_ENABLE()			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR |= (1<<17))
+#define USART2_CLOCK_DISABLE()			(((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR &= ~(1<<17))
 
+
+#define SPI3_CLOCK_RESET()              do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB1RSTR |= (1<<15)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB1RSTR &= ~(1<<15)); }while(0)
+#define SPI2_CLOCK_RESET()              do{ (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB1RSTR |= (1<<14)); delay(1000); (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB1RSTR &= ~(1<<14)); }while(0)
+
+#define SPI1_CLOCK_ENABLE()             (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR |= (1<<12))
+#define SPI2_CLOCK_ENABLE()             (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB1ENR |= (1<<17))
+#define SPI3_CLOCK_ENABLE()             (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB1ENR |= (1<<17))
+#define SPI4_CLOCK_ENABLE()             (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR |= (1<<17))
+#define SPI5_CLOCK_ENABLE()             (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR |= (1<<17))
+#define SPI6_CLOCK_ENABLE()             (((rcc_def*)RCC_BASE_ADDRESS)->RCC_APB2ENR |= (1<<17))
 
 typedef enum{
     PLLSAIRDY       = (1 << 29 )   ,

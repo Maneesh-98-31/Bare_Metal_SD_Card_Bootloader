@@ -7,7 +7,7 @@ typedef enum{
     RCC_E           =       (1),
     USART_E         =       (RCC_E + 1),
     GPIO_E          =       (RCC_E + 2),
-    SPI_E           =       (RCC_R + 3)
+    SPI_E           =       (RCC_E + 3)
 }module;
 
 

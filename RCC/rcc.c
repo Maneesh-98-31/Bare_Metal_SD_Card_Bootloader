@@ -3,9 +3,9 @@
 #include "error.h"
 
 
-
 uint32_t rcc_init(CLOCK_SELECTION clock){
     uint32_t ret = failed(RCC_E);
+    RCC = (rcc_def*)RCC_BASE_ADDRESS;
     ret = disable_rcc(clock);
     delay(100);
     ret = enable_rcc(clock);

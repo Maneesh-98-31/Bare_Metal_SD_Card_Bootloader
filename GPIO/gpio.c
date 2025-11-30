@@ -4,8 +4,7 @@
 #include "error.h"
 #include "tool.h"
 
- 
-static gpio_def *gpio_reg;
+
 
 uint32_t gpio_init(GPIOX gpiox){
     uint32_t ret = failed(GPIO_E);
@@ -72,21 +71,21 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION interface){
         case UART1:{
             //  Configure PA9 (TX) and PA10 (RX) as Alternate Function AF7
             uint32_t temp = ( MODER9_ALTERNATE_FUNCTION_MODE | MODER10_ALTERNATE_FUNCTION_MODE);
-            ((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_MODER |= temp;
+            (gpio_reg)->GPIOx_MODER |= temp;
             temp  = (PA1_AFRL9 | PA1_AFRL10);
             //  Select AF7 (USART1) in AFRL register (PA8, PA9 use AFRL)
             delay(1000);
-            ((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_AFRL |=  temp;
+            (gpio_reg)->GPIOx_AFRL |=  temp;
             ret = pass(GPIO_E);
             break;
         }
         case UART2:{
             GPIOA_CLOCK_RESET();
             uint32_t temp = (MODER2_ALTERNATE_FUNCTION_MODE | MODER3_ALTERNATE_FUNCTION_MODE);
-            ((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_MODER |= temp;
+            (gpio_reg)->GPIOx_MODER |= temp;
             temp = (PA2_AFRL7 | PA3_AFRL7);
             delay(1000);
-            ((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_AFRL |= (AFRL2_PA7 | AFRL3_PA7);
+            (gpio_reg)->GPIOx_AFRL |= (AFRL2_PA7 | AFRL3_PA7);
             ret = pass(GPIO_E);
         }
         

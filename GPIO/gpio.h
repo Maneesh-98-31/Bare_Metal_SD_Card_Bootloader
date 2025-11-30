@@ -45,6 +45,8 @@ typedef enum{
     GPIO_F
 } GPIOX;
 
+static gpio_def *gpio_reg;
+
 uint32_t gpio_init(GPIOX);
 uint32_t gpio_pin_config(INTERFACE_SELECTION);
 

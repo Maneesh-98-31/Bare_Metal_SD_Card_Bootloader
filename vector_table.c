@@ -19,7 +19,9 @@ void NMI_Handler(){
 }
 
 void HardFault_Handler(){
-
+    while(1){
+        
+    }
 }
 
 void MemManage_Handler(){
