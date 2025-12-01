@@ -87,6 +87,20 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION interface){
             delay(1000);
             (gpio_reg)->GPIOx_AFRL |= (AFRL2_PA7 | AFRL3_PA7);
             ret = pass(GPIO_E);
+            break;
+        }
+        case SPI2:{
+            SPI2_CLOCK_RESET();
+            uint32_t modar_select = (MODER5_ALTERNATE_FUNCTION_MODE | MODER6_ALTERNATE_FUNCTION_MODE | MODER7_ALTERNATE_FUNCTION_MODE);
+            uint32_t pin_select = (PA5_AFRL7 | PA6_AFRL7 | PA7_AFRL7);
+            uint32_t speed = (VERY_HIGH_SPEED << MODER5) | (VERY_HIGH_SPEED << MODER6) | (VERY_HIGH_SPEED << MODER7);
+            uint32_t otyper = ~(OT5 | OT7);
+            uint32_t pull_up_pull_down_register = (PULL_UP << MODER6);
+            (gpio_reg)->GPIOx_MODER |= modar_select;
+            (gpio_reg)->GPIOx_AFRL |= pin_select;
+            (gpio_reg)->GPIOx_OSPEEDR |= speed;
+            (gpio_reg)->GPIOx_PUPDR |= pull_up_pull_down_register;
+            break;
         }
         
         default:

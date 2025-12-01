@@ -227,6 +227,28 @@ void peripheral_clock_enable_register(INTERFACE_SELECTION interface){
                 delay(0x1000);
                 RCC->RCC_APB1RSTR &= ~UART2RST;
                 RCC->RCC_APB1ENR |= UART2EN;
+                break;
+            }
+            case SPI1:{
+                RCC->RCC_APB2RSTR |= SPI1RST;
+                delay(0x1000);
+                RCC->RCC_APB2RSTR &= ~SPI1RST;
+                RCC->RCC_APB2ENR |= SPI1EN;
+                break;
+            }
+            case SPI2:{
+                RCC->RCC_APB1RSTR |= SPI2RST;
+                delay(0x1000);
+                RCC->RCC_APB1RSTR &= ~SPI2RST;
+                RCC->RCC_APB1ENR |= SPI2EN;
+                break;
+            }
+            case SPI3:{
+                RCC->RCC_APB1RSTR |= SPI3RST;
+                delay(0x1000);
+                RCC->RCC_APB1RSTR &= ~SPI3RST;
+                RCC->RCC_APB1ENR |= SPI3EN;
+                break;
             }
             default:
                 //ret = failed(RCC_E);

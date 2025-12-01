@@ -50,6 +50,11 @@ static gpio_def *gpio_reg;
 uint32_t gpio_init(GPIOX);
 uint32_t gpio_pin_config(INTERFACE_SELECTION);
 
+#define LOW_SPEED                                   0x0
+#define MEDIUM_SPEED                                0x1
+#define HIGH_SPEED                                  0x2
+#define VERY_HIGH_SPEED                             0x3
+
 
 #define MODER0_OUTPUT_MODE	                        (1 << 2*0)
 #define MODER1_OUTPUT_MODE	                        (1 << 2*1)
@@ -68,6 +73,23 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION);
 #define MODER14_OUTPUT_MODE	                        (1 << 2*14)
 #define MODER15_OUTPUT_MODE	                        (1 << 2*15)
 
+
+#define MODER0                                         (2*0)
+#define MODER1                                         (2*1)
+#define MODER2                                         (2*2)
+#define MODER3                                         (2*3)
+#define MODER4                                         (2*4)
+#define MODER5                                         (2*5)
+#define MODER6                                         (2*6)
+#define MODER7                                         (2*7)
+#define MODER8                                         (2*8)
+#define MODER9                                         (2*9)
+#define MODER10                                        (2*10)
+#define MODER11                                        (2*11)
+#define MODER12                                        (2*12)
+#define MODER13                                        (2*13)
+#define MODER14                                        (2*14)
+#define MODER15                                        (2*15)
 
 
 
@@ -197,6 +219,11 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION);
 #define AF13	                                        13
 #define AF14	                                        14
 #define AF15	                                        15
+
+
+#define NO_PULL_UP_PULL_DOWN                            0x0
+#define PULL_UP                                         0x1
+#define PULL_DOWN                                       0x2
 
 
 #define PA0_AFRL0 (AF0 << 4*0)
