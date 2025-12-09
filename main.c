@@ -4,14 +4,11 @@
 #include "error.h"
 #include "gpio.h"
 #include "rcc.h"
+#include "spi.h"
+#include "sd.h"
 
-void boot_main(){
+void uart_test(){
     uint32_t ret = failed(RCC_E);
-    ret = rcc_init(RCC_PLLON);
-    if(ret == failed(RCC_E)){
-        while(1);
-    }
-    ret = failed(USART_E);
     gpio_init(GPIO_A);
     (void)ret;
     gpio_pin_config(UART2);
@@ -21,5 +18,25 @@ void boot_main(){
     while(1){
         printf("maneesh");
     }
+}
+
+void spi_test(){
+    uint32_t ret = failed(RCC_E);
+    gpio_init(GPIO_A);
+    (void)ret;
+    gpio_pin_config(SPI2);
+    (void)ret;
+    spi_init(SPI_1);
+    sd_init();
+}
+
+void boot_main(){
+    uint32_t ret = failed(RCC_E);
+    ret = rcc_init(RCC_PLLON);
+    if(ret == failed(RCC_E)){
+        assert();
+    }
+    
+    
 
 }

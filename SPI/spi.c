@@ -54,6 +54,25 @@ uint32_t spi_init(SPIX spix){
     return ret;
 
 }
-uint32_t spi_transmit(uint8_t tx){
 
+uint32_t spi_transmit(uint8_t tx){
+    uint32_t ret = failed(SPI_E);
+    /* Wait until TXE (transmit buffer empty) */
+    while(!(spi_reg->SPI_SR & TXE)){
+    
+    }
+     /* Write data to be transmitted */
+    spi_reg->SPI_DR = tx;
+    ret = pass(SPI_E);
+    return ret;
+}
+
+uint8_t spi_received(void){
+    /* Wait until RXNE (received buffer empty) */
+    while(!(spi_reg->SPI_SR & RXNE)){
+    
+    }
+     /* Read the received data */
+    uint8_t received_data = spi_reg->SPI_DR;
+    return received_data;
 }

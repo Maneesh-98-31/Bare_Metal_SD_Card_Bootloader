@@ -20,5 +20,6 @@
 
 
 void delay(uint32_t);
+void assert();
 
 #endif

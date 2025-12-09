@@ -7,3 +7,9 @@ void delay(uint32_t val){
     
    }
 }
+
+void assert(){
+   while(1){
+      
+   }
+}

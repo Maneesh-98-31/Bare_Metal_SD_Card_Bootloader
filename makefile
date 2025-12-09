@@ -1,4 +1,5 @@
-INCLUDE_PATHS = -I./ERROR/ -I./TOOLS/ -I./GPIO/ -I./UART/ -I./RCC/ -I./SPI/
+INCLUDE_PATHS = -I./ERROR/ -I./TOOLS/ -I./GPIO/ -I./UART/ -I./RCC/ -I./SPI/ -I./SD/
+FLAGS = -Wconversion -Wall -nodefaultlibs
 
 all:
 	arm-none-eabi-gcc $(INCLUDE_PATHS) -o main.o -c main.c -mcpu=cortex-m4 -g -mthumb 
@@ -9,7 +10,8 @@ all:
 	arm-none-eabi-gcc $(INCLUDE_PATHS) -o uart.o -c ./UART/uart.c -mcpu=cortex-m4 -g -mthumb 
 	arm-none-eabi-gcc $(INCLUDE_PATHS) -o rcc.o -c ./RCC/rcc.c -mcpu=cortex-m4 -g -mthumb 
 	arm-none-eabi-gcc $(INCLUDE_PATHS) -o spi.o -c ./SPI/spi.c -mcpu=cortex-m4 -g -mthumb 
-	arm-none-eabi-ld -Tlinker.ld main.o vector_table.o error.o tool.o gpio.o uart.o rcc.o spi.o -o ./build/stm32F407xx.elf
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o sd.o -c ./SD/sd.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-ld -Tlinker.ld main.o vector_table.o error.o tool.o gpio.o uart.o rcc.o spi.o sd.o -o ./build/stm32F407xx.elf
 	arm-none-eabi-objdump -D -S ./build/stm32F407xx.elf > ./build/stm32F407xx.elf.lst
 
 clean:
