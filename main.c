@@ -36,7 +36,7 @@ void boot_main(){
     if(ret == failed(RCC_E)){
         assert();
     }
-    
+    spi_test();
     
 
 }

@@ -6,49 +6,100 @@
 #include "rcc.h"
 #include "spi.h"
 
-void sd_send_command(uint8_t cmd, uint32_t arg, uint8_t crc) {
-    spi_transmit(0x40 | cmd);          // Start bit + command
-    spi_transmit(arg >> 24);
-    spi_transmit(arg >> 16);
-    spi_transmit(arg >> 8);
-    spi_transmit(arg);
-    spi_transmit(crc);
+
+
+
+void setup_command(sd_command *command ,uint8_t cmd,uint32_t arg,uint8_t crc){
+    command->command = cmd | 0x40;
+    command->arg[0] = (uint8_t)(arg >> 24);
+    command->arg[1] = (uint8_t)(arg >> 16);
+    command->arg[2] = (uint8_t)(arg >> 8);
+    command->arg[3] = (uint8_t)(arg);
+    command->crc = (crc << 0) | 0;
 }
 
-uint8_t sd_wait_response() {
-    uint8_t res = 0x0;
-    for (uint32_t i = 0; i < 8; i++) {
-        spi_transmit(0xFF);
+void clean_command(sd_command *command){
+    command->command = 0;
+    command->arg[0] = command->arg[1] = command->arg[2] = command->arg[3] = 0;
+    command->crc = 0;
+}
+
+uint32_t sd_send_clock_cycles(uint32_t cycle){
+    uint32_t ret = failed(SD_E);
+    CS_HIGH();
+    while(cycle != 0){
+        ret = spi_transmit(0xff);
+        if(ret == failed(SPI_E)){
+            break;
+        }
+        cycle--;
     }
-    return res;
+    
+    if(cycle == 0) ret = pass(SD_E);
+    return ret;
+}
+
+// Send command in SPI mode
+// cmd = index (0..63), arg = 32-bit argument, crc (valid only for CMD0/CMD8)
+sd_responce sd_send_command(sd_command *cmd,sd_responce *resp){
+    uint32_t ret = failed(SD_E);
+    uint8_t *cmd_arr = NULL;
+    do{
+        CS_LOW();
+
+        // One dummy byte before command (recommended)
+        ret = spi_transmit(0xff);
+        if(ret == failed(SPI_E)){
+            break;
+        }
+        cmd_arr = (uint8_t*)cmd;
+        for(uint32_t i=0; i<sizeof(sd_command) ;i++){
+            ret = spi_transmit(cmd_arr[i]);
+        }
+        if(ret == failed(SPI_E)){
+            break;
+        }
+
+        
+
+    }while(0);
+    return ret;
+}
+
+sd_responce sd_wait_response(sd_responce *resp) {
+    uint32_t ret = failed(SD_E);
+
+}
+
+uint32_t sd_write_data_block(const uint8_t *buf,uint8_t token){
+
+}
+
+uint32_t sd_read_data_block(uint8_t *buf, uint16_t len){
+    
 }
 
 uint32_t sd_init() {
-    CS_HIGH();
-    for (uint8_t i = 0; i < 10; i++) spi_transmit(0xFF); // 80+ clock cycles
-    CS_LOW();
+    uint32_t ret = failed(SD_E);
+    sd_command command;
+    sd_responce resp;
+    do{
+        ret = sd_send_clock_cycle(10);      // 80+ dummy clocks with CS high
+        if(ret == failed(SD_E))
+            break;
 
-    sd_send_command(0, 0, 0x95); // CMD0
-    if (sd_wait_response() != 0x01) return -1;
 
-    CS_HIGH(); spi_transmit(0xFF); CS_LOW();
-    sd_send_command(8, 0x1AA, 0x87); // CMD8
-    if (sd_wait_response() != 0x01) return -2;
+        setup_command(&command,0x0,0x0,0x95);       // set up commond CMD0: GO_IDLE_STATE
+        ret = sd_send_command(&command,&resp);        // send CMD0: GO_IDLE_STATE command
+        clear_command(&command);                    // clear command
+        if(ret = failed(SD_E))
+            break;
 
-    // Send ACMD41 until card ready
-    for (uint8_t i = 0; i < 1000; i++) {
-        CS_HIGH(); spi_transmit(0xFF); CS_LOW();
-        sd_send_command(55, 0, 0); // CMD55
-        sd_wait_response();
-        sd_send_command(41, 0x40000000, 0); // ACMD41
-        if (sd_wait_response() == 0x00) break;
-    }
 
-    // CMD58 to read OCR
-    CS_HIGH(); spi_transmit(0xFF); CS_LOW();
-    sd_send_command(58, 0, 0); // CMD58
-    if (sd_wait_response() != 0x00) return -4;
+        ret = sd_send_clock_cycle(1);
+        if(ret == failed(SD_E))
+            break;
 
-    CS_HIGH(); spi_transmit(0xFF);
-    return 0;
+    }while(0);
+    return ret;
 }
