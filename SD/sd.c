@@ -18,12 +18,6 @@ void setup_command(sd_command *command ,uint8_t cmd,uint32_t arg,uint8_t crc){
     command->crc = (crc << 0) | 0;
 }
 
-void clean_command(sd_command *command){
-    command->command = 0;
-    command->arg[0] = command->arg[1] = command->arg[2] = command->arg[3] = 0;
-    command->crc = 0;
-}
-
 uint32_t sd_send_clock_cycles(uint32_t cycle){
     uint32_t ret = failed(SD_E);
     CS_HIGH();
@@ -41,9 +35,9 @@ uint32_t sd_send_clock_cycles(uint32_t cycle){
 
 // Send command in SPI mode
 // cmd = index (0..63), arg = 32-bit argument, crc (valid only for CMD0/CMD8)
-sd_responce sd_send_command(sd_command *cmd,sd_responce *resp){
+uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
     uint32_t ret = failed(SD_E);
-    uint8_t *cmd_arr = NULL;
+    uint8_t *cmd_arr = 0;
     do{
         CS_LOW();
 
@@ -60,15 +54,19 @@ sd_responce sd_send_command(sd_command *cmd,sd_responce *resp){
             break;
         }
 
-        
+
 
     }while(0);
     return ret;
 }
 
-sd_responce sd_wait_response(sd_responce *resp) {
+uint32_t sd_wait_response(sd_responce *resp) {
     uint32_t ret = failed(SD_E);
-
+    uint8_t resp_arr[sizeof(sd_responce)];
+    do{
+        
+    }while(0);
+    return ret;
 }
 
 uint32_t sd_write_data_block(const uint8_t *buf,uint8_t token){
@@ -91,7 +89,7 @@ uint32_t sd_init() {
 
         setup_command(&command,0x0,0x0,0x95);       // set up commond CMD0: GO_IDLE_STATE
         ret = sd_send_command(&command,&resp);        // send CMD0: GO_IDLE_STATE command
-        clear_command(&command);                    // clear command
+        mem_clear(&command,sizeof(command));                    // clear command
         if(ret = failed(SD_E))
             break;
 
