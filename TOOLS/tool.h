@@ -21,5 +21,7 @@
 
 void delay(uint32_t);
 void assert();
+void mem_clear(void *address,uint32_t size);
+void mem_copy(void *src,void *dest,uint32_t size);
 
 #endif

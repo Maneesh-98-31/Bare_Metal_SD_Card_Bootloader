@@ -47,50 +47,50 @@ uint8_t spi_received(void);
 #define fPCLK_256                       7
 
 
-#define CPHA                            (1<<0)
-#define CPOL                            (1<<1)
-#define MSTR                            (1<<2)
-#define BR(val)                         (val<<3)
-#define SPE                             (1<<6)
-#define LSBFIRST                        (1<<7)
-#define SSI                             (1<<8)
-#define SSM                            (1<<9)
-#define RXONLY                          (1<<10)
-#define DFF                             (1<<11)
-#define CRCNEXT                         (1<<12)
-#define CRCEN                           (1<<13)
-#define BIDIOE                          (1<<14)
-#define BIDIMODE                        (1<<15)
+#define SPI_CPHA                            (1<<0)
+#define SPI_CPOL                            (1<<1)
+#define SPI_MSTR                            (1<<2)
+#define SPI_BR(val)                         (val<<3)
+#define SPI_SPE                             (1<<6)
+#define SPI_LSBFIRST                        (1<<7)
+#define SPI_SSI                             (1<<8)
+#define SPI_SSM                            (1<<9)
+#define SPI_RXONLY                          (1<<10)
+#define SPI_DFF                             (1<<11)
+#define SPI_CRCNEXT                         (1<<12)
+#define SPI_CRCEN                           (1<<13)
+#define SPI_BIDIOE                          (1<<14)
+#define SPI_BIDIMODE                        (1<<15)
 
 
-#define TXEIE                           (1<<7)
-#define RXNEIE                          (1<<6)
-#define ERRIE                           (1<<5)
-#define FRF                             (1<<4)
-#define SSOE                            (1<<2)
-#define TXDMAEN                         (1<<1)
-#define RXDMAEN                         (1<<0)
+#define SPI_TXEIE                           (1<<7)
+#define SPI_RXNEIE                          (1<<6)
+#define SPI_ERRIE                           (1<<5)
+#define SPI_FRF                             (1<<4)
+#define SPI_SSOE                            (1<<2)
+#define SPI_TXDMAEN                         (1<<1)
+#define SPI_RXDMAEN                         (1<<0)
 
 
-#define FRE                             (1<<8)
-#define BSY                             (1<<7)
-#define OVR                             (1<<6)
-#define MODF                            (1<<5)
-#define CRC_ERR                         (1<<4)
-#define UDR                             (1<<3)
-#define CHSIDE                          (1<<2)
-#define TXE                             (1<<1)
-#define RXNE                            (1<<0)
+#define SPI_FRE                             (1<<8)
+#define SPI_BSY                             (1<<7)
+#define SPI_OVR                             (1<<6)
+#define SPI_MODF                            (1<<5)
+#define SPI_CRC_ERR                         (1<<4)
+#define SPI_UDR                             (1<<3)
+#define SPI_CHSIDE                          (1<<2)
+#define SPI_TXE                             (1<<1)
+#define SPI_RXNE                            (1<<0)
 
 
-#define DR                              (1<<0)
+#define SPI__DR                              (1<<0)
 
-#define CRCPOLY                         (1<<0)
+#define SPI__CRCPOLY                         (1<<0)
 
-#define RXCRC                           (1<<0)
+#define SPI__RXCRC                           (1<<0)
 
 
-#define TXCRC                           (1<<0)
+#define SPI__TXCRC                           (1<<0)
 
 
 #endif

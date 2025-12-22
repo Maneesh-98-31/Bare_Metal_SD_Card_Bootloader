@@ -48,9 +48,9 @@ uint32_t spi_init(SPIX spix){
       - CPOL = 0, CPHA = 0 (Mode 0) by default; change if your peripheral needs different mode
       - DFF default 8-bit (DFF bit in CR1 for 16-bit; keep 0)
     */
-    spi_reg->SPI_CR1 = (MSTR | SSM | SSI);
-    spi_reg->SPI_CR1 |= BR(fPCLK_16);
-    spi_reg->SPI_CR1 |= SPE;
+    spi_reg->SPI_CR1 = (SPI_MSTR | SPI_SSM | SPI_SSI);
+    spi_reg->SPI_CR1 |= SPI_BR(fPCLK_16);
+    spi_reg->SPI_CR1 |= SPI_SPE;
     return ret;
 
 }
@@ -58,7 +58,7 @@ uint32_t spi_init(SPIX spix){
 uint32_t spi_transmit(uint8_t tx){
     uint32_t ret = failed(SPI_E);
     /* Wait until TXE (transmit buffer empty) */
-    while(!(spi_reg->SPI_SR & TXE)){
+    while(!(spi_reg->SPI_SR & SPI_TXE)){
     
     }
      /* Write data to be transmitted */
@@ -69,7 +69,7 @@ uint32_t spi_transmit(uint8_t tx){
 
 uint8_t spi_received(void){
     /* Wait until RXNE (received buffer empty) */
-    while(!(spi_reg->SPI_SR & RXNE)){
+    while(!(spi_reg->SPI_SR & SPI_RXNE)){
     
     }
      /* Read the received data */

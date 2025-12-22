@@ -18,7 +18,7 @@ void setup_command(sd_command *command ,uint8_t cmd,uint32_t arg,uint8_t crc){
     command->crc = (crc << 0) | 0;
 }
 
-uint32_t sd_send_clock_cycles(uint32_t cycle){
+uint32_t sd_send_clock_cycle(uint32_t cycle){
     uint32_t ret = failed(SD_E);
     CS_HIGH();
     while(cycle != 0){
@@ -54,7 +54,7 @@ uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
             break;
         }
 
-
+        sd_wait_response(resp);
 
     }while(0);
     return ret;
@@ -64,7 +64,11 @@ uint32_t sd_wait_response(sd_responce *resp) {
     uint32_t ret = failed(SD_E);
     uint8_t resp_arr[sizeof(sd_responce)];
     do{
-        
+        for(uint32_t loop = 0; loop<sizeof(sd_responce); loop++){
+            resp_arr[loop] = spi_received();
+        }
+        mem_copy((void*)resp,(void*)resp_arr,sizeof(sd_responce));
+        ret = pass(SD_E);
     }while(0);
     return ret;
 }
@@ -87,16 +91,29 @@ uint32_t sd_init() {
             break;
 
 
-        setup_command(&command,0x0,0x0,0x95);       // set up commond CMD0: GO_IDLE_STATE
+        setup_command(&command,CMD0,0x0,0x95);       // set up commond CMD0: GO_IDLE_STATE
         ret = sd_send_command(&command,&resp);        // send CMD0: GO_IDLE_STATE command
-        mem_clear(&command,sizeof(command));                    // clear command
-        if(ret = failed(SD_E))
+        if(ret = failed(SD_E) || resp.response == IN_IDLE_STATE)
             break;
+        mem_clear(&command,sizeof(command));                    // clear command
+        mem_clear(&resp,sizeof(resp));                          // clear responce
 
 
         ret = sd_send_clock_cycle(1);
         if(ret == failed(SD_E))
             break;
+
+
+        // CMD8: SEND_IF_COND (check SD v2, 2.7-3.6V, pattern 0xAA)    
+        setup_command(&command,CMD8,0x000001AA,0x87);      // CRC for CMD8
+        ret = sd_send_command(&command,&resp);
+        if(ret = failed(SD_E) || resp.response == IN_IDLE_STATE)
+            break;
+        mem_clear(&command,sizeof(command));                    // clear command
+        mem_clear(&resp,sizeof(resp));                          // clear responce
+
+
+
 
     }while(0);
     return ret;

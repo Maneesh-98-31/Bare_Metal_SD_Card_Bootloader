@@ -20,6 +20,27 @@ typedef struct {
 }sd_responce;
 
 
+typedef enum{
+    IN_IDLE_STATE         =   (1<<0),
+    ERASE_STATE           =   (1<<1),
+    ILLEGAL_CMD           =   (1<<2),
+    CMD_CRC_ERROR           =   (1<<3),
+    ERASE_SEQ_ERROR         =   (1<<4),
+    ADDRESS_ERROR           =   (1<<5),
+    PARAM_ERROR             =   (1<<6)  
+} RESPONCES;
+
+typedef enum{
+    CMD0    =   0u,     // GO_IDLE_STATE: Resets the SD card to the idle state.
+    CMD8    =   8u,     //	SEND_IF_COND: Sends interface condition (check voltage/version).
+    CMD16   =   16u,    // SET_BLOCKLEN: Sets the block length for read/write (default 512 bytes).   
+    CMD17   =   17u,    // READ_SINGLE_BLOCK: Reads a single block of data from the card.
+    CMD24   =   24u,    // WRITE_BLOCK: Writes a single block of data to the card.
+    CM55    =   55u,    // APP_CMD: Informs the card the next command is application-specific.
+    ACMD41  =   41u,    // 	SD_SEND_OP_COND: Sends host capacity support information.
+    CMD58    =  58u     // 	READ_OCR: Reads the Operation Conditions Register.
+} COMMANDS;
+
 uint32_t sd_init(void);
 uint32_t sd_send_command(sd_command *cmd,sd_responce *resp);
 uint32_t sd_wait_response(sd_responce *resp);

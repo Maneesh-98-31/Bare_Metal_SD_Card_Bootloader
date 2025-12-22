@@ -1,7 +1,7 @@
 #ifndef _UART_H_
 #define _UART_H_
 
-#include <stdint.h>
+#include "stdint.h"
 #include "rcc.h"
 
 typedef struct{
