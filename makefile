@@ -18,5 +18,10 @@ clean:
 	rm *.o
 	rm ./build/stm32F407xx.elf.lst
 	rm ./build/stm32F407xx.elf
+
+cls:
+	del *.o
+	del .\build\stm32F407xx.elf.lst
+	del .\build\stm32F407xx.elf
 	
 	

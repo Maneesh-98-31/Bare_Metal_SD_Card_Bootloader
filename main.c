@@ -8,16 +8,17 @@
 #include "sd.h"
 
 void uart_test(){
-    uint32_t ret = failed(RCC_E);
-    gpio_init(GPIO_A);
-    (void)ret;
-    gpio_pin_config(UART2);
-    (void)ret;
-    ret = uart_init(UART2);
-    (void)ret;
-    while(1){
-        printf("maneesh");
-    }
+    //uint32_t ret = failed(RCC_E);
+    //gpio_init(GPIO_A);
+    //(void)ret;
+    //gpio_pin_config(UART2);
+    //(void)ret;
+    //ret = uart_init(UART2);
+    //(void)ret;
+    //while(1){
+    //    printf("maneesh");
+    //}
+    spi_test();
 }
 
 void spi_test(){

@@ -36,7 +36,7 @@ typedef enum{
     CMD16   =   16u,    // SET_BLOCKLEN: Sets the block length for read/write (default 512 bytes).   
     CMD17   =   17u,    // READ_SINGLE_BLOCK: Reads a single block of data from the card.
     CMD24   =   24u,    // WRITE_BLOCK: Writes a single block of data to the card.
-    CM55    =   55u,    // APP_CMD: Informs the card the next command is application-specific.
+    CMD55    =   55u,    // APP_CMD: Informs the card the next command is application-specific.
     ACMD41  =   41u,    // 	SD_SEND_OP_COND: Sends host capacity support information.
     CMD58    =  58u     // 	READ_OCR: Reads the Operation Conditions Register.
 } COMMANDS;
@@ -47,5 +47,6 @@ uint32_t sd_wait_response(sd_responce *resp);
 uint32_t sd_write_data_block(const uint8_t *buf,uint8_t token);
 uint32_t sd_read_data_block(uint8_t *buf, uint16_t len);
 uint32_t sd_send_clock_cycles(uint32_t cycle);
+uint32_t sd_send_command_acmd(sd_command *cmd,sd_responce *resp);
 
 #endif

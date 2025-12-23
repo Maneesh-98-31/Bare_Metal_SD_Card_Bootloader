@@ -15,7 +15,7 @@ void* vector_table[256] __attribute__((section(".isr_vector"))) = {
 
 
 void NMI_Handler(){
-
+    
 }
 
 void HardFault_Handler(){
