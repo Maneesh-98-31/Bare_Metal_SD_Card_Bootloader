@@ -25,10 +25,18 @@ void spi_test(){
     uint32_t ret = failed(RCC_E);
     gpio_init(GPIO_A);
     (void)ret;
-    gpio_pin_config(SPI2);
+    gpio_pin_config(SPI1_SD);
     (void)ret;
     spi_init(SPI_1);
-    sd_init();
+    //sd_init();
+    uint8_t commond[] = {0x40,0x0,0x0,0x0,0x0,0x95};
+    uint8_t resp[6] = {0};
+    for(int i=0;i<sizeof(commond);i++){
+        resp[i] = spi_transmit(commond[i]);
+        //resp[i] = spi_received();
+    }
+    (void)commond;
+    (void)resp;
 }
 
 void boot_main(){
@@ -38,6 +46,6 @@ void boot_main(){
         assert();
     }
     spi_test();
-    
+    while(1);
 
 }

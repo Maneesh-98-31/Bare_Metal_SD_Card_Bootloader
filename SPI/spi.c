@@ -6,7 +6,7 @@
 
 #define SPI_LOW_POWER   0
 
-static spi_def *spi_reg;
+static spi_def* spi_reg;
  
 uint32_t spi_init(SPIX spix){
     uint32_t ret = failed(SPI_E);
@@ -64,7 +64,12 @@ uint32_t spi_transmit(uint8_t tx){
      /* Write data to be transmitted */
     spi_reg->SPI_DR = tx;
     ret = pass(SPI_E);
-    return ret;
+    while(!(spi_reg->SPI_SR & SPI_RXNE)){
+    
+    }
+    uint8_t received_data = (uint8_t)spi_reg->SPI_DR;
+    return received_data; 
+    return received_data;
 }
 
 uint8_t spi_received(void){
@@ -73,6 +78,6 @@ uint8_t spi_received(void){
     
     }
      /* Read the received data */
-    uint8_t received_data = spi_reg->SPI_DR;
+    uint8_t received_data = (uint8_t)spi_reg->SPI_DR;
     return received_data;
 }
