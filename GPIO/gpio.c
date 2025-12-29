@@ -97,7 +97,7 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION interface){
                                     | MODER7_ALTERNATE_FUNCTION_MODE \
                                     | MODER4_GENERAL_PURPOSE_OUTPUT_MODE
                                 );
-            uint32_t pin_select = (PA5_AFRL7 | PA6_AFRL7 | PA7_AFRL7);
+            uint32_t pin_select = ((5 << 4*6) | (5 << 4*5) | (5 << 4*7)); //(PA5_AFRL7 | PA6_AFRL7 | PA7_AFRL7);
             uint32_t speed = (VERY_HIGH_SPEED << MODER5)                \
                             | (VERY_HIGH_SPEED << MODER6)               \
                             | (VERY_HIGH_SPEED << MODER7)               \
@@ -108,7 +108,9 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION interface){
             (gpio_reg)->GPIOx_MODER |= modar_select;
             (gpio_reg)->GPIOx_AFRL |= pin_select;
             (gpio_reg)->GPIOx_OSPEEDR |= speed;
-            (gpio_reg)->GPIOx_PUPDR |= pull_up_pull_down_register;
+            (gpio_reg)->GPIOx_OTYPER &= otyper;
+            (gpio_reg)->GPIOx_ODR |= (1 << 4);
+            //(gpio_reg)->GPIOx_PUPDR |= pull_up_pull_down_register;
             break;
         }
 
