@@ -98,7 +98,7 @@ void spi_debug_master_arduino(){
     
 }
 
-void spi1_slave(uint8_t dataToReply){
+uint8_t spi1_slave(uint8_t dataToReply){
     // 1. Load the data into the buffer so it's ready for the Master's clock
     while (!( ((spi_def*)SPI1_BASE_ADDRESS)->SPI_SR & (1 << 1))); // Wait for TXE
      ((spi_def*)SPI1_BASE_ADDRESS)->SPI_DR = dataToReply;
@@ -107,8 +107,10 @@ void spi1_slave(uint8_t dataToReply){
     // The RXNE flag will set once the Master has finished shifting
     while (!( ((spi_def*)SPI1_BASE_ADDRESS)->SPI_SR & (1 << 0))); // Wait for RXNE
 
+    uint8_t data = (uint8_t) ((spi_def*)SPI1_BASE_ADDRESS)->SPI_DR;
+
     // 3. Return the data sent by the Master
-    return (uint8_t) ((spi_def*)SPI1_BASE_ADDRESS)->SPI_DR;
+    return data;
 }
 
 void spi_debug_slave_arduino(){
@@ -129,17 +131,19 @@ void spi_debug_slave_arduino(){
     ((spi_def*)SPI1_BASE_ADDRESS)->SPI_CR1 |= (1 << 6);                // SPE: SPI Enable
     uint8_t recv = 0x0;
     while(1){
-        spi1_slave(0xa6);
+        uint8_t data = spi1_slave(0xa6);
+        data += 0;
+
     }
 }
 
 void boot_main(){
     uint32_t ret = failed(RCC_E);
-    ret = rcc_init(RCC_PLLON);
+    ret = rcc_init(RCC_HSEON);
     if(ret == failed(RCC_E)){
         assert();
     }
-    spi_debug_slave_arduino();
+    spi_debug_master_arduino();
     while(1);
 
 }
