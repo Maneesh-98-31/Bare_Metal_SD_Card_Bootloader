@@ -46,8 +46,7 @@ void spi_test(){
     (void)resp;
 }
 
-uint8_t spi1_master(void) {
-uint8_t sendData = 0xa6; // Example data
+uint8_t spi1_master(uint8_t sendData) {
     uint8_t receivedData = 0;
 
     // 1. Manually pull Chip Select Low (If you configured a CS pin)
@@ -68,9 +67,6 @@ uint8_t sendData = 0xa6; // Example data
     //delay(1000U);
      CS_HIGH();
     // 4. Verification
-    if (receivedData == sendData) {
-        // Success: Data went through MOSI -> Jumper -> MISO
-    }
     return receivedData;
 }
 
@@ -91,10 +87,14 @@ void spi_debug_master_arduino(){
     // 5. Enable spi1
     ((spi_def*)SPI1_BASE_ADDRESS)->SPI_CR1 |= (1 << 6);                // SPE: SPI Enable
     uint8_t recv = 0x0;
-    while(1){
-        recv = spi1_master();
-        (void)recv;
-    }
+    do{
+        uint8_t commond[] = {0xff,0xff,0xff,0x40,0x0,0x0,0x0,0x0,0x95,0xff,0xff,0xff};
+        uint8_t resp[6] = {0};
+        for(int i=0;i<sizeof(commond);i++){
+            resp[i] = spi1_master(commond[i]);
+        }
+    }while(0);
+
     
 }
 
