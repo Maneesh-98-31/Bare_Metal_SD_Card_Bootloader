@@ -25,7 +25,7 @@ void spi_test(){
     uint32_t ret = failed(RCC_E);
     gpio_init(GPIO_A);
     (void)ret;
-    gpio_pin_config(SPI2);
+    gpio_pin_config(SPI1_SD);
     (void)ret;
     spi_init(SPI_1);
     sd_init();

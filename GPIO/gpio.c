@@ -90,21 +90,27 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION interface){
             ret = pass(GPIO_E);
             break;
         }
-        case SPI2:{
+        case SPI1_SD:{
             GPIOA_CLOCK_RESET();
             uint32_t modar_select = (MODER5_ALTERNATE_FUNCTION_MODE  \
                                     | MODER6_ALTERNATE_FUNCTION_MODE  \
-                                    | MODER7_ALTERNATE_FUNCTION_MODE);
-            uint32_t pin_select = (PA5_AFRL7 | PA6_AFRL7 | PA7_AFRL7);
+                                    | MODER7_ALTERNATE_FUNCTION_MODE  \
+                                    | MODER4_GENERAL_PURPOSE_OUTPUT_MODE  
+                                );
+            uint32_t pin_select = (AF5_PIN6 | AF5_PIN5 | AF5_PIN7);
+            // AFx << 4*PINx
             uint32_t speed = (VERY_HIGH_SPEED << MODER5)                \
                             | (VERY_HIGH_SPEED << MODER6)               \
-                            | (VERY_HIGH_SPEED << MODER7);
-            uint32_t otyper = ~(OT5 | OT7);
-            uint32_t pull_up_pull_down_register = (PULL_UP << MODER6);
+                            | (VERY_HIGH_SPEED << MODER7)               \
+                            | (VERY_HIGH_SPEED << MODER4)
+                            ;
+            uint32_t otyper = ~(OT5 | OT7 | OT4);
+            uint32_t pull_up_pull_down_register = (PULL_UP << PIN4);
             (gpio_reg)->GPIOx_MODER |= modar_select;
             (gpio_reg)->GPIOx_AFRL |= pin_select;
             (gpio_reg)->GPIOx_OSPEEDR |= speed;
-            (gpio_reg)->GPIOx_PUPDR |= pull_up_pull_down_register;
+            (gpio_reg)->GPIOx_OTYPER &= otyper;
+            (gpio_reg)->GPIOx_ODR |= pull_up_pull_down_register;
             break;
         }
         

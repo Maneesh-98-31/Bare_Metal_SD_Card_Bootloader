@@ -81,7 +81,8 @@ typedef enum{
     UART3,
     UART2,
     SPI3,
-    SPI2
+    SPI2,
+    SPI1_SD
 }INTERFACE_SELECTION;
 
 
