@@ -3,11 +3,17 @@
 #include "rcc.h"
 #include "error.h"
 #include "tool.h"
+#include "gpio.h"
 
 #define SPI_LOW_POWER   0
 
 static spi_def *spi_reg;
  
+#define SPI1_CS_PIN   4U    /* PA4 */
+#define CS_LOW()  (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << (SPI1_CS_PIN + 16)))
+#define CS_HIGH() (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << SPI1_CS_PIN))
+
+
 uint32_t spi_init(SPIX spix){
     uint32_t ret = failed(SPI_E);
     switch (spix){
@@ -56,16 +62,28 @@ uint32_t spi_init(SPIX spix){
 
 }
 
-uint32_t spi_transmit(uint8_t tx){
-    uint32_t ret = failed(SPI_E);
+uint32_t spi_transmit_receive(uint8_t send_data){
+    //pull Chip Select Low (If you configured a CS pin)
+    CS_LOW();
     /* Wait until TXE (transmit buffer empty) */
     while(!(spi_reg->SPI_SR & SPI_TXE)){
-    
+
     }
      /* Write data to be transmitted */
-    spi_reg->SPI_DR = tx;
-    ret = pass(SPI_E);
-    return ret;
+    spi_reg->SPI_DR = send_data;
+
+    uint8_t received_data = 0U;
+
+    /* Wait until RXNE (received buffer empty) */
+    while(!(spi_reg->SPI_SR & SPI_RXNE)){
+    
+    }
+    received_data = spi_reg->SPI_DR;
+    
+    while (spi_reg->SPI_SR & SPI_BSY);    // This ensures the LAST clock pulse has physically finished on the wire.
+
+    CS_HIGH();
+    return received_data;
 }
 
 uint8_t spi_received(void){

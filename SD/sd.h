@@ -6,10 +6,6 @@
 
 #define SPI1_CS_PIN   4U    /* PA4 */
 
-#define CS_LOW()  (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << (SPI1_CS_PIN + 16)))
-#define CS_HIGH() (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << SPI1_CS_PIN))
-
-
 typedef struct {
     uint8_t command;
     uint8_t arg[4];

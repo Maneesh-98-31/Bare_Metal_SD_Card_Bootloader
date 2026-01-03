@@ -20,9 +20,8 @@ void setup_command(sd_command *command ,uint8_t cmd,uint32_t arg,uint8_t crc){
 
 uint32_t sd_send_clock_cycle(uint32_t cycle){
     uint32_t ret = failed(SD_E);
-    CS_HIGH();
     while(cycle != 0){
-        ret = spi_transmit(0xff);
+        ret = spi_transmit_receive(0xff);
         if(ret == failed(SPI_E)){
             break;
         }
@@ -37,24 +36,26 @@ uint32_t sd_send_clock_cycle(uint32_t cycle){
 // cmd = index (0..63), arg = 32-bit argument, crc (valid only for CMD0/CMD8)
 uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
     uint32_t ret = failed(SD_E);
-    uint8_t *cmd_arr = 0;
+    uint8_t *cmd_arr = 0,*resp_arr = 0;
     do{
-        CS_LOW();
 
         // One dummy byte before command (recommended)
-        ret = spi_transmit(0xff);
+        ret = sd_send_clock_cycle(0x1);
         if(ret == failed(SPI_E)){
             break;
         }
         cmd_arr = (uint8_t*)cmd;
+        resp_arr = (uint8_t*)resp;
         for(uint32_t i=0; i<sizeof(sd_command) ;i++){
-            ret = spi_transmit(cmd_arr[i]);
+            resp_arr[i] = spi_transmit_receive(cmd_arr[i]);
         }
         if(ret == failed(SPI_E)){
             break;
         }
 
-        sd_wait_response(resp);
+        // One dummy byte before command (recommended)
+        ret = sd_send_clock_cycle(0x1);
+        //sd_wait_response(resp);
 
     }while(0);
     return ret;
@@ -85,11 +86,11 @@ uint32_t sd_send_command_acmd(sd_command *cmd,sd_responce *resp){
     sd_responce pre_resp;
     setup_command(&pre_cmd,CMD55,0,0x01);
     sd_send_command(&pre_cmd,&pre_resp);
-    CS_HIGH();
-    spi_transmit(0xff);
+    
+    sd_send_clock_cycle(0x1);
     sd_send_command(cmd,resp);
-    CS_HIGH();
-    spi_transmit(0xff);
+    
+    sd_send_clock_cycle(0x1);
     ret = pass(SD_E);
     return ret;
 }
