@@ -6,6 +6,7 @@
 #include "rcc.h"
 #include "spi.h"
 #include "tool.h"
+#include "stdbool.h"
 
 #define SPI1_CS_PIN   4U    /* PA4 */
 #define CS_LOW()  (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << (SPI1_CS_PIN + 16)))
@@ -39,7 +40,9 @@ uint32_t sd_send_clock_cycle(uint32_t cycle){
 // cmd = index (0..63), arg = 32-bit argument, crc (valid only for CMD0/CMD8)
 uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
     uint32_t ret = failed(SD_E);
-    uint8_t *cmd_arr = 0,*resp_arr = 0;
+    uint8_t *cmd_arr = (uint8_t*)0,*resp_arr = (uint8_t*)0;
+    bool responce_flag = false;
+    uint32_t responce_top = 0;
     do{
 
         // One dummy byte before command (recommended)
@@ -47,16 +50,25 @@ uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
         if(ret == failed(SPI_E)){
             break;
         }
+
         cmd_arr = (uint8_t*)cmd;
         resp_arr = (uint8_t*)resp;
         for(uint32_t i=0; i<sizeof(sd_command) ;i++){
-            resp_arr[i] = spi_transmit_receive(cmd_arr[i]);
-            delay(10);
+            spi_transmit_receive(cmd_arr[i]);
+            //delay(10);
         }
-        for(uint32_t i=0;i<10;i++){
-            spi_transmit_receive(0xff);
+
+        for(uint32_t i=0;i<20;i++){
+            uint8_t responce = spi_transmit_receive(0xff);
+            if( (IN_IDLE_STATE == responce || true == responce_flag)            \
+                && sizeof(responce) > responce_top ){
+                resp_arr[responce_top++] = responce;
+                responce_flag = true;
+            }
         }
-        if(ret == failed(SPI_E)){
+
+        if(ret == failed(SPI_E) || false == responce_flag){
+            ret = failed(SPI_E);
             break;
         }
 
@@ -131,37 +143,44 @@ uint32_t sd_init() {
         delay(100);
 
         if(ret = failed(SD_E)){
-            //break;
+            break;
         }
 
         if(resp.response != IN_IDLE_STATE){
             ret = failed(SD_E);
-            //break;
+            break;
         }
 
         mem_clear(&command,sizeof(command));                    // clear command
         mem_clear(&resp,sizeof(resp));                          // clear responce
 
+        // send 5 dummy cycles
         CS_LOW();
-        ret = sd_send_clock_cycle(1);
+        ret = sd_send_clock_cycle(5);
         if(ret == failed(SD_E))
             break;
         CS_HIGH();
         delay(100);
 
-        CS_LOW();
-        // CMD8: SEND_IF_COND (check SD v2, 2.7-3.6V, pattern 0xAA)    
+        // prepare command
+        // CMD8: SEND_IF_COND (check SD v2, 2.7-3.6V, pattern 0xAA)     
         setup_command(&command,CMD8,0x000001AA,0x87);      // CRC for CMD8
+        CS_LOW();
         ret = sd_send_command(&command,&resp);
         CS_HIGH();
         if(ret = failed(SD_E))
             break;
-
         
-        if(resp.response != IN_IDLE_STATE){
+
+        // Check that voltage accepted and pattern matches
+        if(resp.response != IN_IDLE_STATE ||                        \
+            resp.operation_condition_register[2] == 0x1 ||          \
+            resp.operation_condition_register[3] == 0xaa
+        ){
             ret = failed(SD_E);
             break;    
         }
+
         mem_clear(&command,sizeof(command));                    // clear command
         mem_clear(&resp,sizeof(resp));                          // clear responce
 
