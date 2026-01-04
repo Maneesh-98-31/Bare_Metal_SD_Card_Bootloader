@@ -56,7 +56,8 @@ uint32_t spi_init(SPIX spix){
     */
     spi_reg->SPI_CR1 = (SPI_MSTR | SPI_SSM | SPI_SSI);
     spi_reg->SPI_CR1 |= SPI_BR(fPCLK_16);
-    spi_reg->SPI_CR1 &= ((~SPI_CPHA) & (~(SPI_CPOL)));     // CPOL=0, CPHA=0 (Mode 0)
+    //spi_reg->SPI_CR1 &= ((~SPI_CPHA) & (~(SPI_CPOL)));     // CPOL=0, CPHA=0 (Mode 0)
+    spi_reg->SPI_CR1 |= (0 << 0) | (0 << 1);
     spi_reg->SPI_CR1 |= SPI_SPE;
     return ret;
 
@@ -64,7 +65,7 @@ uint32_t spi_init(SPIX spix){
 
 uint32_t spi_transmit_receive(uint8_t send_data){
     //pull Chip Select Low (If you configured a CS pin)
-    CS_LOW();
+    //CS_LOW();
     /* Wait until TXE (transmit buffer empty) */
     while(!(spi_reg->SPI_SR & SPI_TXE)){
 
@@ -82,7 +83,7 @@ uint32_t spi_transmit_receive(uint8_t send_data){
     
     while (spi_reg->SPI_SR & SPI_BSY);    // This ensures the LAST clock pulse has physically finished on the wire.
 
-    CS_HIGH();
+    //CS_HIGH();
     return received_data;
 }
 

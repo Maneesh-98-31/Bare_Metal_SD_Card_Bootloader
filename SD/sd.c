@@ -5,8 +5,11 @@
 #include "gpio.h"
 #include "rcc.h"
 #include "spi.h"
+#include "tool.h"
 
-
+#define SPI1_CS_PIN   4U    /* PA4 */
+#define CS_LOW()  (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << (SPI1_CS_PIN + 16)))
+#define CS_HIGH() (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << SPI1_CS_PIN))
 
 
 void setup_command(sd_command *command ,uint8_t cmd,uint32_t arg,uint8_t crc){
@@ -48,6 +51,10 @@ uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
         resp_arr = (uint8_t*)resp;
         for(uint32_t i=0; i<sizeof(sd_command) ;i++){
             resp_arr[i] = spi_transmit_receive(cmd_arr[i]);
+            delay(10);
+        }
+        for(uint32_t i=0;i<10;i++){
+            spi_transmit_receive(0xff);
         }
         if(ret == failed(SPI_E)){
             break;
@@ -109,38 +116,48 @@ uint32_t sd_init() {
     sd_command command;
     sd_responce resp;
     do{
-        ret = sd_send_clock_cycle(10);      // 80+ dummy clocks with CS high
+        CS_LOW();
+        ret = sd_send_clock_cycle(20);      // 80+ dummy clocks with CS high
         if(ret == failed(SD_E))
             break;
+        CS_HIGH();
+        delay(100);
 
 
+        CS_LOW();
         setup_command(&command,CMD0,0x0,0x95);       // set up commond CMD0: GO_IDLE_STATE
         ret = sd_send_command(&command,&resp);        // send CMD0: GO_IDLE_STATE command
+        CS_HIGH();
+        delay(100);
 
         if(ret = failed(SD_E)){
-            break;
+            //break;
         }
 
         if(resp.response != IN_IDLE_STATE){
             ret = failed(SD_E);
-            break;
+            //break;
         }
 
         mem_clear(&command,sizeof(command));                    // clear command
         mem_clear(&resp,sizeof(resp));                          // clear responce
 
-
+        CS_LOW();
         ret = sd_send_clock_cycle(1);
         if(ret == failed(SD_E))
             break;
+        CS_HIGH();
+        delay(100);
 
-
+        CS_LOW();
         // CMD8: SEND_IF_COND (check SD v2, 2.7-3.6V, pattern 0xAA)    
         setup_command(&command,CMD8,0x000001AA,0x87);      // CRC for CMD8
         ret = sd_send_command(&command,&resp);
+        CS_HIGH();
         if(ret = failed(SD_E))
             break;
 
+        
         if(resp.response != IN_IDLE_STATE){
             ret = failed(SD_E);
             break;    
