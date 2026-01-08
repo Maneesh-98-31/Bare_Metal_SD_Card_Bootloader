@@ -12,6 +12,11 @@
 #define CS_LOW()  (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << (SPI1_CS_PIN + 16)))
 #define CS_HIGH() (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << SPI1_CS_PIN))
 
+#define SD_BLOCK_SIZE   512
+
+// Card type global (SDHC / SDSC)
+sd_type_t g_sd_type = SD_TYPE_UNKNOWN;
+
 
 void setup_command(sd_command *command ,uint8_t cmd,uint32_t arg,uint8_t crc){
     command->command = cmd | 0x40;
@@ -24,6 +29,7 @@ void setup_command(sd_command *command ,uint8_t cmd,uint32_t arg,uint8_t crc){
 
 uint32_t sd_send_clock_cycle(uint32_t cycle){
     uint32_t ret = failed(SD_E);
+    CS_LOW();
     while(cycle != 0){
         ret = spi_transmit_receive(0xff);
         if(ret == failed(SPI_E)){
@@ -31,10 +37,14 @@ uint32_t sd_send_clock_cycle(uint32_t cycle){
         }
         cycle--;
     }
-    
+    CS_HIGH();
+    delay(100);
     if(cycle == 0) ret = pass(SD_E);
     return ret;
 }
+
+
+
 
 // Send command in SPI mode
 // cmd = index (0..63), arg = 32-bit argument, crc (valid only for CMD0/CMD8)
@@ -44,12 +54,10 @@ uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
     bool responce_flag = false;
     uint32_t responce_top = 0;
     do{
-
+        CS_LOW();
         // One dummy byte before command (recommended)
-        ret = sd_send_clock_cycle(0x1);
-        if(ret == failed(SPI_E)){
-            break;
-        }
+        spi_transmit_receive(0xff);
+        
 
         cmd_arr = (uint8_t*)cmd;
         resp_arr = (uint8_t*)resp;
@@ -66,15 +74,18 @@ uint32_t sd_send_command(sd_command *cmd,sd_responce *resp){
                 responce_flag = true;
             }
         }
-
-        if(ret == failed(SPI_E) || false == responce_flag){
-            ret = failed(SPI_E);
+        
+        if(false == responce_flag){
+            ret = failed(SD_E);
             break;
         }
-
+        
         // One dummy byte before command (recommended)
-        ret = sd_send_clock_cycle(0x1);
+        spi_transmit_receive(0xff);
+        CS_HIGH();
         //sd_wait_response(resp);
+        delay(100);
+        ret = pass(SD_E);
 
     }while(0);
     return ret;
@@ -106,6 +117,10 @@ uint32_t sd_send_command_acmd(sd_command *cmd,sd_responce *resp){
     setup_command(&pre_cmd,CMD55,0,0x01);
     sd_send_command(&pre_cmd,&pre_resp);
     
+    if(pre_resp.response > 0x1){
+        ret = failed(SD_E);
+    }
+
     sd_send_clock_cycle(0x1);
     sd_send_command(cmd,resp);
     
@@ -116,33 +131,73 @@ uint32_t sd_send_command_acmd(sd_command *cmd,sd_responce *resp){
 
 
 uint32_t sd_write_data_block(const uint8_t *buf,uint8_t token){
-
+    
 }
 
 uint32_t sd_read_data_block(uint8_t *buf, uint16_t len){
-    
+    uint16_t timeout = 0xFFFF;
+    uint8_t token;
+    // 1) Wait for token 0xFE
+    do {
+        token = spi_transmit_receive(0xff);
+        
+    } while ((token == 0xFF) && --timeout);
+
+    if (token != 0xFE) {
+        // Not a valid start token
+        return failed(SD_E);
+    }
+        // 2) Read 'len' bytes into buffer
+    for (uint16_t i = 0; i < len; i++) {
+        buf[i] = spi_transmit_receive(0xFF);
+    }
+
+        // 3) Read and ignore 2 CRC bytes
+    spi_transmit_receive(0xFF);
+    spi_transmit_receive(0xFF);
+
+    return true;
 }
+
+
+uint32_t sd_read_block(uint32_t lba, uint8_t *buf){
+    ret = failed(SD_E);
+    uint16_t timeout = 0xff;
+    uint8_t token = 0;
+    sd_command command;
+    sd_responce resp;
+    if(g_sd_type == SD_TYPE_SDSC){
+        lba <<=9;
+    }
+    // CMD17: READ_SINGLE_BLOCK
+    setup_command(&command,CMD17,lba,0x01);       // set up commond CMD0: GO_IDLE_STATE
+    sd_send_command(&command,&resp);        // send CMD0: GO_IDLE_STATE command
+    if(resp.response != 0x0){
+        
+    }
+
+    // Here is where we actually RECEIVE data from card:
+    // wait for 0xFE, then 512 bytes, then CRC.
+
+}
+
 
 uint32_t sd_init() {
     uint32_t ret = failed(SD_E);
     sd_command command;
     sd_responce resp;
     do{
-        CS_LOW();
         ret = sd_send_clock_cycle(20);      // 80+ dummy clocks with CS high
         if(ret == failed(SD_E))
             break;
-        CS_HIGH();
-        delay(100);
 
 
-        CS_LOW();
+
         setup_command(&command,CMD0,0x0,0x95);       // set up commond CMD0: GO_IDLE_STATE
         ret = sd_send_command(&command,&resp);        // send CMD0: GO_IDLE_STATE command
-        CS_HIGH();
-        delay(100);
 
-        if(ret = failed(SD_E)){
+        if(ret == failed(SD_E) || IN_IDLE_STATE != resp.response){
+            ret = failed(SD_E);
             break;
         }
 
@@ -155,20 +210,18 @@ uint32_t sd_init() {
         mem_clear(&resp,sizeof(resp));                          // clear responce
 
         // send 5 dummy cycles
-        CS_LOW();
+
         ret = sd_send_clock_cycle(5);
         if(ret == failed(SD_E))
             break;
-        CS_HIGH();
-        delay(100);
+
 
         // prepare command
         // CMD8: SEND_IF_COND (check SD v2, 2.7-3.6V, pattern 0xAA)     
         setup_command(&command,CMD8,0x000001AA,0x87);      // CRC for CMD8
-        CS_LOW();
         ret = sd_send_command(&command,&resp);
-        CS_HIGH();
-        if(ret = failed(SD_E))
+        
+        if(ret == failed(SD_E))
             break;
         
 
@@ -184,24 +237,41 @@ uint32_t sd_init() {
         mem_clear(&command,sizeof(command));                    // clear command
         mem_clear(&resp,sizeof(resp));                          // clear responce
 
+        // send 5 dummy cycles
+        ret = sd_send_clock_cycle(5);
+        if(ret == failed(SD_E))
+            break;
+ 
+
         // Now repeatedly send ACMD41 with HCS bit set until card is ready
-        uint32_t timeout = 0xffff;
+        uint32_t timeout = 0xff;
         setup_command(&command,ACMD41,0x40000000,0x01);
         do{
             sd_send_command_acmd(&command,&resp);
-        }while(--timeout != 0);
+        }while(--timeout != 0 && resp.response != 0x0);
+
+        if(timeout == 0 || resp.response != 0x0 ){
+            ret = failed(SD_E);
+            break;
+        }
+
         mem_clear(&command,sizeof(command));                    // clear command
         mem_clear(&resp,sizeof(resp));                          // clear responce
 
         // CMD58: READ_OCR to check CCS (capacity)
         setup_command(&command,CMD58,0,0x01);
         sd_send_command(&command,&resp);
-        if(resp.response != 0x0){
-            ret = failed(SD_E);
-            break;
-        }
         
+        sd_send_clock_cycle(4);
 
+        if(resp.response & 0x40){
+            g_sd_type = SD_TYPE_SDHC;  // High capacity: block addressing
+        }else{
+            g_sd_type = SD_TYPE_SDSC;  // Standard capacity: byte addressing
+        }
+
+        spi_set_high_speed();
+        
     }while(0);
     return ret;
 }

@@ -29,6 +29,7 @@ void spi_test(){
     (void)ret;
     spi_init(SPI_1);
     sd_init();
+    
 }
 
 void boot_main(){

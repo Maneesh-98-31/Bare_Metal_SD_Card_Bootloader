@@ -96,3 +96,10 @@ uint8_t spi_received(void){
     uint8_t received_data = spi_reg->SPI_DR;
     return received_data;
 }
+
+void spi_set_high_speed(void){
+    spi_reg->SPI_CR1 &= ~SPI_SPE;
+    spi_reg->SPI_CR1 &= ~SPI_BR(fPCLK_16);
+    spi_reg->SPI_CR1 |= SPI_BR(fPCLK_4);
+    spi_reg->SPI_CR1 |= SPI_SPE;
+}

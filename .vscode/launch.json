@@ -17,7 +17,11 @@
       // Optional: preLaunchTask name to build the project before debugging
       "preLaunchTask": "build",
       "configFiles": [],
-      "searchDir": []
+      "searchDir": [],
+      "includePath": [
+                "${workspaceFolder}/**"
+                // Add specific paths for external libraries here
+            ]
     },
     {
       "name": "ST: Debug (Launch)",

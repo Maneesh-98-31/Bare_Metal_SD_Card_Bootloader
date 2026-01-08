@@ -17,6 +17,11 @@ typedef struct {
     uint8_t operation_condition_register[4];
 }sd_responce;
 
+typedef enum{
+    SD_TYPE_UNKNOWN,        
+    SD_TYPE_SDHC,       // High capacity: block addressing
+    SD_TYPE_SDSC        // Standard capacity: byte addressing
+} sd_type_t;
 
 typedef enum{
     IN_IDLE_STATE         =   (1<<0),

@@ -36,6 +36,7 @@ typedef struct {
 uint32_t spi_init(SPIX);
 uint32_t spi_transmit(uint8_t);
 uint8_t spi_received(void);
+void spi_set_high_speed(void);
 
 #define fPCLK_2                         0
 #define fPCLK_4                         1
