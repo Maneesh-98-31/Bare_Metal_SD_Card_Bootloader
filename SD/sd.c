@@ -12,7 +12,7 @@
 #define CS_LOW()  (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << (SPI1_CS_PIN + 16)))
 #define CS_HIGH() (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << SPI1_CS_PIN))
 
-#define SD_BLOCK_SIZE   512
+
 #define MAX_DELAY_CYCLE     0x2
 
 // Card type global (SDHC / SDSC)
@@ -133,7 +133,61 @@ uint32_t sd_send_command_acmd(sd_command *cmd,sd_responce *resp){
 
 
 uint32_t sd_write_data_block(const uint8_t *buf,uint8_t token){
-    
+    uint32_t ret = failed(SD_E);
+    uint16_t timeout = 0xffff;
+    do{
+        CS_LOW();
+
+        // 0xFE = single block write token
+        spi_transmit_receive(token);
+       
+        for(uint32_t i=0;i<SD_BLOCK_SIZE;i++){
+            spi_transmit_receive(buf[i]);
+        }
+        // dummy CRC
+        sd_send_clock_cycle(MAX_DELAY_CYCLE);
+
+          // Data response token: 0bXXX0_0101 means "data accepted"
+        if((spi_transmit_receive(0xff)&0x1f)==0x05){
+            ret = failed(SD_E);
+            break;
+        }
+
+        // Wait until card is not busy (MISO goes 0xFF)
+        while(spi_transmit_receive(0xff) == 0x0);
+
+        ret = pass(SD_E);
+        CS_HIGH();
+        
+    }while(0);
+    return ret;
+}
+
+uint32_t sd_write_block(uint32_t lba,const uint8_t *buf){
+    uint32_t ret = failed(SD_E);
+    sd_command pre_cmd;
+    sd_responce pre_resp;
+    do{
+        if(g_sd_type == SD_TYPE_SDSC){
+            lba <<=9;
+        }
+
+        setup_command(&pre_cmd,CMD24,lba,0x01);
+        if(sd_send_command(&pre_cmd,&pre_resp) == COMMAND_ACCEPTED){
+            ret = failed(SD_E);
+            break;
+        }
+
+        if(sd_write_data_block(buf,0xfe) == failed(SD_E)){
+            ret = failed(SD_E);
+            break;
+        }
+        
+        ret = pass(SD_E);
+        
+
+    }while(0);
+
 }
 
 uint32_t sd_read_data_block(uint8_t *buf, uint16_t len){
@@ -159,10 +213,11 @@ uint32_t sd_read_data_block(uint8_t *buf, uint16_t len){
         }
 
             // 3) Read and ignore 2 CRC bytes
-       sd_send_clock_cycle(MAX_DELAY_CYCLE);
+        sd_send_clock_cycle(MAX_DELAY_CYCLE);
         CS_HIGH();
+        ret = pass(SD_E);
     }while(0);
-    return true;
+    return ret;
 }
 
 
@@ -186,8 +241,12 @@ uint32_t sd_read_block(uint32_t lba, uint8_t *buf){
 
         // Here is where we actually RECEIVE data from card:
         // wait for 0xFE, then 512 bytes, then CRC.
-        sd_read_data_block(buf,SD_BLOCK_SIZE);
+        if(sd_read_data_block(buf,SD_BLOCK_SIZE) == failed(SD_E)){
+            ret == failed(SD_E);
+            break;
+        }
         sd_send_clock_cycle(MAX_DELAY_CYCLE);
+        ret = pass(SD_E);
     }while(0);
     return ret;
 }

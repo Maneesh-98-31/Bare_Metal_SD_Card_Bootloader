@@ -5,7 +5,7 @@
 #include "gpio.h"
 
 #define SPI1_CS_PIN   4U    /* PA4 */
-
+#define SD_BLOCK_SIZE   512
 typedef struct {
     uint8_t command;
     uint8_t arg[4];
@@ -52,5 +52,7 @@ uint32_t sd_write_data_block(const uint8_t *buf,uint8_t token);
 uint32_t sd_read_data_block(uint8_t *buf, uint16_t len);
 uint32_t sd_send_clock_cycles(uint32_t cycle);
 uint32_t sd_send_command_acmd(sd_command *cmd,sd_responce *resp);
+uint32_t sd_write_block(uint32_t lba,const uint8_t *buf);
+uint32_t sd_read_block(uint32_t lba, uint8_t *buf);
 
 #endif

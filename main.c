@@ -29,9 +29,15 @@ void spi_test(){
     (void)ret;
     spi_init(SPI_1);
     sd_init();
-    uint8_t buffer[512];
-    mem_clear(buffer,sizeof(buffer));
-    sd_read_block(0,buffer);
+    uint8_t write_buffer[512];
+    uint8_t read_buffer[512];
+    mem_clear(write_buffer,sizeof(write_buffer));
+    mem_clear(read_buffer,sizeof(read_buffer));
+    for(uint32_t i=0;i<SD_BLOCK_SIZE;i++){
+        write_buffer[i] = 0xa0 | (i%0x10);
+    }
+    sd_write_block(0,write_buffer);
+    sd_read_block(0,read_buffer);
     while(1);
 }
 
