@@ -29,7 +29,10 @@ void spi_test(){
     (void)ret;
     spi_init(SPI_1);
     sd_init();
-    
+    uint8_t buffer[512];
+    mem_clear(buffer,sizeof(buffer));
+    sd_read_block(0,buffer);
+    while(1);
 }
 
 void boot_main(){

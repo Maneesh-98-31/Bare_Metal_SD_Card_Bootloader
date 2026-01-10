@@ -24,13 +24,14 @@ typedef enum{
 } sd_type_t;
 
 typedef enum{
-    IN_IDLE_STATE         =   (1<<0),
-    ERASE_STATE           =   (1<<1),
-    ILLEGAL_CMD           =   (1<<2),
-    CMD_CRC_ERROR           =   (1<<3),
-    ERASE_SEQ_ERROR         =   (1<<4),
-    ADDRESS_ERROR           =   (1<<5),
-    PARAM_ERROR             =   (1<<6)  
+    COMMAND_ACCEPTED      =    (0u),
+    IN_IDLE_STATE         =   (1u<<0),
+    ERASE_STATE           =   (1u<<1),
+    ILLEGAL_CMD           =   (1u<<2),
+    CMD_CRC_ERROR           =   (1u<<3),
+    ERASE_SEQ_ERROR         =   (1u<<4),
+    ADDRESS_ERROR           =   (1u<<5),
+    PARAM_ERROR             =   (1u<<6)  
 } RESPONCES;
 
 typedef enum{
