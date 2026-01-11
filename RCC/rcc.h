@@ -82,7 +82,8 @@ typedef enum{
     UART2,
     SPI3,
     SPI2,
-    SPI1_SD
+    SPI1_SD,
+    CRC
 }INTERFACE_SELECTION;
 
 
@@ -246,7 +247,7 @@ typedef enum{
     DMA2DRST        = (1 << 23),
     DMA2RST         = (1 << 22),
     DMA1RST         = (1 << 21),
-    CRCRST          = (1 << 11),
+    CRCRST          = (1 << 12),
     GPIOKRST        = (1 << 10),
     GPIOJRST        = (1 << 9),
     GPIOIRST        = (1 << 8),

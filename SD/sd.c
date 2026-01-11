@@ -13,7 +13,7 @@
 #define CS_HIGH() (((gpio_def*)GPIOA_BASE_ADDRESS)->GPIOx_BSRR  |= (1U << SPI1_CS_PIN))
 
 
-#define MAX_DELAY_CYCLE     0x2
+#define MAX_DELAY_CYCLE     0x5
 
 // Card type global (SDHC / SDSC)
 sd_type_t g_sd_type = SD_TYPE_UNKNOWN;

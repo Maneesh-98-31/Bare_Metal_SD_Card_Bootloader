@@ -250,6 +250,12 @@ void peripheral_clock_enable_register(INTERFACE_SELECTION interface){
                 RCC->RCC_APB1ENR |= SPI3EN;
                 break;
             }
+            case CRC:{
+                RCC->RCC_AHB1RSTR |= CRCRST;
+                delay(0x1000);
+                RCC->RCC_AHB1RSTR &= ~CRCRST;
+                RCC->RCC_AHB1ENR |= CRCEN;
+            }
             default:
                 //ret = failed(RCC_E);
                 break;

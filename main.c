@@ -6,6 +6,7 @@
 #include "rcc.h"
 #include "spi.h"
 #include "sd.h"
+#include "crc.h"
 
 void uart_test(){
     //uint32_t ret = failed(RCC_E);
@@ -38,6 +39,10 @@ void spi_test(){
     }
     sd_write_block(0,write_buffer);
     sd_read_block(0,read_buffer);
+    crc_init();
+    crc_reset();
+    uint32_t crc = calculate_crc(read_buffer,SD_BLOCK_SIZE);
+    (void)crc;
     while(1);
 }
 
