@@ -9,7 +9,8 @@ typedef enum{
     GPIO_E          =       (RCC_E + 2),
     SPI_E           =       (RCC_E + 3),
     SD_E            =       (RCC_E + 4),
-    CRC_E           =       (RCC_E + 5)
+    CRC_E           =       (RCC_E + 5),
+    IMAGE_E           =       (RCC_E + 6)
 }module;
 
 
