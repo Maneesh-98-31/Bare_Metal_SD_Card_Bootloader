@@ -8,6 +8,11 @@ MEMORY
 _estack = ORIGIN(RAM) + LENGTH(RAM);
 _rdata = ORIGIN(RAM);
 
+
+/*FORMAT(binary)
+
+*/
+
 SECTIONS
 {
   .isr_vector : {
@@ -31,7 +36,7 @@ SECTIONS
     *(.data*)
      . = ALIGN(4);
      _e_ram_data = .;
-  } >RAM AT> FLASH
+  } > FLASH
 
   _e_flash_data = LOADADDR(.bss);
 
@@ -47,7 +52,17 @@ SECTIONS
     
   } >FLASH
 
-  /DISCARD/ :{
-  
-  }
+  /* Embedded BIN */
+  .payload :
+  {
+      . = ALIGN(4);
+      _payload_start = .;
+
+      /* KEEP the actual DATA sections from app.o */
+      KEEP(app.o(.data))
+
+      . = ALIGN(4);
+      _payload_end = .;
+  } >FLASH
+
 }

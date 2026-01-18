@@ -35,7 +35,7 @@ uint32_t uart_init(INTERFACE_SELECTION interface){
 }
 
 
-void printf(const char *str){
+void printf_e(const char *str){
     if(str == 0){
         return;
     }

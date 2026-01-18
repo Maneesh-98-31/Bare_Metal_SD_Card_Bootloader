@@ -23,7 +23,9 @@ void mem_clear(void *address,uint32_t size){
 
 void mem_copy(void *src,void *dest,uint32_t size){
    uint8_t *src_ptr = (uint8_t*)src, *dest_ptr = (uint8_t*)dest;
-   while(src_ptr < (src_ptr + size)){
+   while(size--){
       *dest_ptr = *src_ptr;
+      src_ptr++;
+      dest_ptr++;
    }
 }

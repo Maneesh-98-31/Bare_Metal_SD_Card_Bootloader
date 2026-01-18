@@ -26,7 +26,7 @@ typedef struct{
 
 
 uint32_t uart_init(INTERFACE_SELECTION);
-void printf(const char*);
+void printf_e(const char*);
 void uart_send_char(char);
 
 

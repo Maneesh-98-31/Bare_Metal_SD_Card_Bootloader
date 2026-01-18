@@ -10,9 +10,9 @@ uint32_t gpio_init(GPIOX gpiox){
     uint32_t ret = failed(GPIO_E);
     switch (gpiox){
         case GPIO_A:
-            gpio_reg = (gpio_def*)GPIOA_BASE_ADDRESS;
-            GPIOA_CLOCK_ENABLE();
-            ret = pass(GPIO_E);
+            gpio_reg = (gpio_def*)GPIOA_BASE_ADDRESS;  
+            GPIOA_CLOCK_ENABLE(); 
+            ret = pass(GPIO_E); 
             break;
         case GPIO_B:
             gpio_reg = (gpio_def*)GPIOB_BASE_ADDRESS;
@@ -75,7 +75,7 @@ uint32_t gpio_pin_config(INTERFACE_SELECTION interface){
             temp  = (PA1_AFRL9 | PA1_AFRL10);
             //  Select AF7 (USART1) in AFRL register (PA8, PA9 use AFRL)
             delay(1000);
-            (gpio_reg)->GPIOx_AFRL |=  temp;
+            (gpio_reg)->GPIOx_AFRL |=  temp; 
             ret = pass(GPIO_E);
             break;
         }

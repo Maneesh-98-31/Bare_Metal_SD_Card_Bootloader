@@ -1,4 +1,4 @@
-INCLUDE_PATHS = -I./ERROR/ -I./TOOLS/ -I./GPIO/ -I./UART/ -I./RCC/ -I./SPI/ -I./SD/ -I./CRC/
+INCLUDE_PATHS = -I./ERROR/ -I./TOOLS/ -I./GPIO/ -I./UART/ -I./RCC/ -I./SPI/ -I./SD/ -I./CRC/ -I./IMAGE/
 FLAGS = -Wconversion -Wall -nodefaultlibs
 
 all:
@@ -12,8 +12,12 @@ all:
 	arm-none-eabi-gcc $(INCLUDE_PATHS) -o spi.o -c ./SPI/spi.c -mcpu=cortex-m4 -g -mthumb 
 	arm-none-eabi-gcc $(INCLUDE_PATHS) -o sd.o -c ./SD/sd.c -mcpu=cortex-m4 -g -mthumb 
 	arm-none-eabi-gcc $(INCLUDE_PATHS) -o crc.o -c ./CRC/crc.c -mcpu=cortex-m4 -g -mthumb 
-	arm-none-eabi-ld -Tlinker.ld main.o vector_table.o error.o tool.o gpio.o uart.o rcc.o spi.o sd.o crc.o -o ./build/stm32F407xx.elf
+	arm-none-eabi-gcc $(INCLUDE_PATHS) -o image.o -c ./IMAGE/image.c -mcpu=cortex-m4 -g -mthumb 
+	arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm test_app.bin app.o
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -nostdlib -T linker.ld main.o vector_table.o error.o tool.o gpio.o uart.o rcc.o spi.o sd.o crc.o image.o app.o -o ./build/stm32F407xx.elf
 	arm-none-eabi-objdump -D -S ./build/stm32F407xx.elf > ./build/stm32F407xx.elf.lst
+	arm-none-eabi-objcopy -O binary ./build/stm32F407xx.elf ./build/stm32F407xx.bin
+	arm-none-eabi-objdump -h build/stm32F407xx.elf
 
 clean:
 	rm *.o
