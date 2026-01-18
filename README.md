@@ -68,4 +68,4 @@ This bootloader was developed and tested on:
 ### Build Instructions
 
 ```bash
-make 
+make all
